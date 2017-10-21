@@ -21,39 +21,28 @@ On the other hand, using DNSs of the local subnet may not be a good idea (e.g., 
 Thus, besides bypassing the networking of data, we also need to bypassing DNS queries. 
 
 ```
-             firewall
-                ++
-                ||
-+--------+      ||       +--------+
-|        |      ||       |        |
-|   ○    |      ||       |   ●    |
-| client+----------------->server |
-|        |      ||       |        |
-|        |      ||       |        |
-+--------+      ||       +--------+
-  client        ||         server
-  subnet        ++         subnet
+            □                          ■               □                       ■
+         content      firewall      content         content      firewall   content                              firewall
+         server1         ++         server2         server1         ++      server2              step2:             ++
+                         ||                                         ||                           compare returned   ||
+                         ||            ^               ^            ||                           results with a     ||
+                 step2   ||            |               |            ||                           predefined ip list ||
+            +--------------------------+               |  step2     ||                                              ||
+            |            ||                            |            ||                           +---+              ||
+            v    step1   ||                            v            ||                   ○ +---> | ? | +-----------------> ●
+            ○ +----------------------> ●               ○            ||         ●       client    +---+     step1:   ||   server
+          client         ||          server          client         ||       server             chinadns   query    ||     +
+                         ||   return   +               +  step1     ||                             +       DNS1&2   ||     |
+                         ||   ■'s ip   |               |            ||                             |                ||     |
+                         ||            |               |  return    ||                             |                ||     |
+                         ||            v               v  □'s ip    ||                             v                ||     v
+            ☆           ++            ★               ☆           ++         ★                 ☆                ++     ★
+           DNS1                       DNS2            DNS1                    DNS2                DNS1                    DNS2
 
 
+           (a) chnroutes.py fails to obtain            (b) the preferred traffic.             (c) Bypassing with chinadns.
+               the ip of content server1.
 
-
-   □                          ■
-content      firewall      content
-server1         ++         server2
-                ||
-                ||            ^
-                ||            |
-   +--------------------------+
-   |            ||
-   v            ||
-   ○ +----------------------> ●
- client         ||          server
-                ||   return   +
-                ||   ■'s ip   |
-                ||            |
-                ||            v
-   ☆           ++            ★
-  DNS1                       DNS2
 ```
 
 We describe a configuration which bypasses different DNS queries to different 
