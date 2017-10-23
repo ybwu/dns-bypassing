@@ -15,33 +15,33 @@ Specifically, when resolving a domain name,
 the client could forward the query to the VPN server, and get a result from a DNS in the remote subnet
 (`/etc/resolv.conf` contains both the vpn server and default DNSs of the local subnet).
 If a website deploys CDN and has a content server in the remote subnet, 
-the DNS may return an ip which can not be applied with chnroutes.py's routing rules.
+the DNS may return a ip which can not be applied with chnroutes.py's routing rules.
 As a result, the following data traffic will be forwarded to the VPN server (then to the content server).
 On the other hand, using DNSs of the local subnet may not be a good idea (e.g., DNS poisoning). 
 Thus, besides bypassing the networking of data, we also need to bypass DNS queries. 
 
 ```
-                             ■           □                                    step2:
-                          content     content                                 compare returned
-    □                     server2     server1                  ■              results with a
- content                     ^           ^                  content           predefined ip list    firewall
- server1    firewall         |           |                  server2                                  +---+
-             +---+           |           |         firewall                       +---+              |---|
-             |---|           +           v          +---+                 ○ +---> | ? | +-----------------> ●
-    ○  +-------------------> ●           ○          |---|      ●        client    +---+     step1:   |---|server
-  client     |---|         server      client       |---|    server              chinadns   query    +---+  +
-             +---+  return   +           +  return  |---|                           +       DNS1&2          |
-                    ■'s ip   |           |  □'s ip  +---+                           |                       |
-    ☆                       |           |                     ★                   |                       |
-   DNS1                      v           v                    DNS2                  v                       v
-                             ★          ☆                                         ☆                      ★
-                            DNS2        DNS1                                       DNS1                    DNS2
+                              ■           □
+                           content     content                              step2:
+     □                     server2     server1                  ■           compare returned
+  content                     ^           ^                  content        results with a         firewall
+  server1    firewall         |           |         firewall server2        predefined ip list      +---+
+              +---+           |           |          +---+                       +---+              |---|
+              |---|           |           |          |---|               ○ +---> | ? | +-----------------> ●
+     ○  +-------------------> +           +          |---|      ●      client    +---+     step1:   |---|server
+   client     |---|         server      client       |---|    server            chinadns   query    +---+  +
+              +---+  return   +           +  return  +---+                         +       DNS1&2          |
+                     ■'s ip   |           |  □'s ip                                |                       |
+     ☆                       |           |                     ★                 |                       |
+    DNS1                      v           v                    DNS2                v                       v
+                              ★          ☆                                       ☆                      ★
+                             DNS2        DNS1                                     DNS1                    DNS2
 
 
-(a) chnroutes.py fails to obtain       (b) the preferred traffic.              (c) Bypassing with chinadns.
-    the ip of content server1.
+ (a) chnroutes.py fails to obtain       (b) the preferred traffic.            (c) Bypassing with chinadns.
+     the ip of content server1.
 
-                                               Figure 1
+                                                Figure 1
 ```
 
 We describe a configuration which bypasses different DNS queries to different 
