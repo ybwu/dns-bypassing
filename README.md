@@ -69,14 +69,14 @@ of `/etc/resolv.conf`. Figure 2 shows the overall setting.
 ## Configurations
 
 ### chinadns
-Install `chinadns`. For Arch Linux, an [AUR package](https://aur.archlinux.org/packages/chinadns/) is available.
+Install `chinadns`. For Arch Linux, a [AUR package](https://aur.archlinux.org/packages/chinadns/) is available.
 Check the installation with
 ```
 systemctl start chinadns
 systemctl status chinadns
 ```
 It will setup a local DNS server at 127.0.0.1 with port 5353 
-(chrome may occupy ports 5353, see instructions in AUR or official repo for a different port).
+(chrome may occupy 5353, see instructions in AUR or official repo for binding to a different port).
 
 ### dnsmasq
 Install `dnsmasq`, and edit `/etc/dnsmasq.conf`
